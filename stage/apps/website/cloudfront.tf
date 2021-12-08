@@ -45,6 +45,11 @@ resource "aws_cloudfront_distribution" "website" {
       origin_read_timeout      = 30
       origin_ssl_protocols     = ["TLSv1.2"]
     }
+
+    custom_header {
+      name  = var.origin_domain_auth_key_header
+      value = random_password.auto_generated["origin-domain-auth-key"].result
+    }
   }
 
   dynamic "custom_error_response" {

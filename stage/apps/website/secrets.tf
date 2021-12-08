@@ -2,6 +2,9 @@ locals {
   auto_generated_secrets = {
     "app-secret" : {
       "length" : 32
+    },
+    "origin-domain-auth-key" : {
+      "length" : 32
     }
   }
 }
