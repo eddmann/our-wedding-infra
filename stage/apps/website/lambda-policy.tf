@@ -43,7 +43,7 @@ resource "aws_iam_policy" "website" {
             "kms:GenerateDataKey"
           ],
           "Resource": "${data.terraform_remote_state.security.outputs.sqs_kms_key.arn}"
-        },
+        }
       ]
     }
   POLICY
