@@ -1,4 +1,3 @@
-#tfsec:ignore:AWS045
 resource "aws_cloudfront_distribution" "website" {
   enabled         = true
   is_ipv6_enabled = true
@@ -6,50 +5,23 @@ resource "aws_cloudfront_distribution" "website" {
   http_version    = "http2"
 
   default_cache_behavior {
-    target_origin_id       = "Website"
-    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods         = ["GET", "HEAD"]
-    viewer_protocol_policy = "redirect-to-https"
-
-    min_ttl     = 0
-    max_ttl     = 0
-    default_ttl = 0
-
-    forwarded_values {
-      query_string = true
-
-      headers = [
-        "Accept",
-        "Accept-Language",
-        "Origin",
-        "Referer"
-      ]
-
-      cookies {
-        forward = "all"
-      }
-    }
+    target_origin_id         = "Website"
+    allowed_methods          = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods           = ["GET", "HEAD"]
+    viewer_protocol_policy   = "redirect-to-https"
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
   }
 
   ordered_cache_behavior {
-    target_origin_id       = "Assets"
-    path_pattern           = "build/*"
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    viewer_protocol_policy = "redirect-to-https"
-
-    compress    = true
-    min_ttl     = 0
-    max_ttl     = 31536000
-    default_ttl = 86400
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
+    target_origin_id         = "Assets"
+    path_pattern             = "build/*"
+    allowed_methods          = ["GET", "HEAD"]
+    cached_methods           = ["GET", "HEAD"]
+    viewer_protocol_policy   = "redirect-to-https"
+    compress                 = true
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+    origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # CORS-S3Origin
   }
 
   origin {
@@ -87,7 +59,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1.2_2021"
+    minimum_protocol_version       = "TLSv1"
   }
 
   restrictions {
