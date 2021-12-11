@@ -1,5 +1,5 @@
 locals {
-  stage = trimprefix(var.ATLAS_WORKSPACE_NAME, "our-wedding-apps-website-")
+  stage = trimprefix(var.TFC_WORKSPACE_NAME, "our-wedding-apps-website-")
 
   tags = {
     Service     = "OurWedding"
