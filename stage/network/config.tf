@@ -31,3 +31,15 @@ provider "aws" {
   secret_key = var.aws_secret_access_key
   region     = var.aws_region
 }
+
+data "terraform_remote_state" "shared_network" {
+  backend = "remote"
+
+  config = {
+    organization = "EddMann"
+
+    workspaces = {
+      name = "our-wedding-shared-network"
+    }
+  }
+}
