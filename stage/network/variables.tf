@@ -13,3 +13,8 @@ variable "cidr_block" {
   type        = string
   description = "The IP address range used within the VPC"
 }
+
+variable "app_names" {
+  type        = list(string)
+  description = "The name of the apps which compose this service stage"
+}

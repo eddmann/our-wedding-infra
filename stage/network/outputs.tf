@@ -15,5 +15,5 @@ output "default_security_group_id" {
 }
 
 output "dns_app_zone_ids" {
-  value = { for app in local.dns_apps : (app) => aws_route53_zone.app[app].zone_id }
+  value = { for app in var.app_names : (app) => aws_route53_zone.app[app].zone_id }
 }
