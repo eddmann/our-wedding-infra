@@ -31,3 +31,16 @@ resource "aws_acm_certificate_validation" "apex" {
   certificate_arn         = aws_acm_certificate.apex.arn
   validation_record_fqdns = [for record in aws_route53_record.apex_cert_validation : record.fqdn]
 }
+
+resource "aws_route53_record" "apex" {
+  zone_id = data.aws_route53_zone.app.zone_id
+  name    = data.aws_route53_zone.app.name
+  type    = "A"
+
+  alias {
+    name    = aws_cloudfront_distribution.website.domain_name
+    zone_id = aws_cloudfront_distribution.website.hosted_zone_id
+
+    evaluate_target_health = true
+  }
+}
