@@ -5,7 +5,9 @@ data "aws_route53_zone" "app" {
 resource "aws_acm_certificate" "apex" {
   provider = aws.us_east_1
 
-  domain_name       = data.aws_route53_zone.app.name
+  domain_name               = data.aws_route53_zone.app.name
+  subject_alternative_names = [format("www.%s", data.aws_route53_zone.app.name)]
+
   validation_method = "DNS"
 
   tags = local.tags
@@ -39,6 +41,19 @@ resource "aws_acm_certificate_validation" "apex" {
 resource "aws_route53_record" "apex" {
   zone_id = data.aws_route53_zone.app.zone_id
   name    = data.aws_route53_zone.app.name
+  type    = "A"
+
+  alias {
+    name    = aws_cloudfront_distribution.website.domain_name
+    zone_id = aws_cloudfront_distribution.website.hosted_zone_id
+
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.app.zone_id
+  name    = "www"
   type    = "A"
 
   alias {

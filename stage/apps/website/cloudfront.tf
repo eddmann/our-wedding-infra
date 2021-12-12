@@ -3,7 +3,11 @@ resource "aws_cloudfront_distribution" "website" {
   is_ipv6_enabled = true
   price_class     = "PriceClass_100"
   http_version    = "http2"
-  aliases         = data.aws_route53_zone.app.name
+
+  aliases = [
+    data.aws_route53_zone.app.name,
+    format("www.%s", data.aws_route53_zone.app.name)
+  ]
 
   default_cache_behavior {
     target_origin_id         = "Website"
