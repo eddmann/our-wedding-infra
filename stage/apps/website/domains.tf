@@ -3,6 +3,8 @@ data "aws_route53_zone" "app" {
 }
 
 resource "aws_acm_certificate" "apex" {
+  provider = aws.us_east_1
+
   domain_name       = data.aws_route53_zone.app.name
   validation_method = "DNS"
 
@@ -28,6 +30,8 @@ resource "aws_route53_record" "apex_cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "apex" {
+  provider = aws.us_east_1
+
   certificate_arn         = aws_acm_certificate.apex.arn
   validation_record_fqdns = [for record in aws_route53_record.apex_cert_validation : record.fqdn]
 }
