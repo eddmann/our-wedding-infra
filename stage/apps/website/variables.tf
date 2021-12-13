@@ -18,3 +18,8 @@ variable "admin_password" {
   type        = string
   description = "The password which is used to login to the admin system"
 }
+
+variable "mailer_dsn" {
+  type        = string
+  description = "The desired Symfony Mailer DSN used for sending email"
+}

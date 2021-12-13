@@ -43,3 +43,15 @@ resource "aws_secretsmanager_secret_version" "admin_password" {
   secret_id     = aws_secretsmanager_secret.admin_password.id
   secret_string = var.admin_password
 }
+
+resource "aws_secretsmanager_secret" "mailer_dsn" {
+  kms_key_id = data.terraform_remote_state.security.outputs.secrets_manager_kms_key.id
+
+  name = format("/our-wedding/%s/apps/website/mailer-dsn", local.stage)
+  tags = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "mailer_dsn" {
+  secret_id     = aws_secretsmanager_secret.mailer_dsn.id
+  secret_string = var.mailer_dsn
+}
