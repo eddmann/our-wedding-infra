@@ -81,3 +81,10 @@ resource "aws_cloudfront_distribution" "website" {
 
   tags = local.tags
 }
+
+resource "aws_ssm_parameter" "origin_domain_auth_key_header" {
+  type  = "String"
+  name  = format("/our-wedding/%s/apps/website/origin-domain-auth-key-header", local.stage)
+  value = var.origin_domain_auth_key_header
+  tags  = local.tags
+}

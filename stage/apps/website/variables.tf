@@ -9,6 +9,12 @@ variable "origin_domain_name" {
 }
 
 variable "origin_domain_auth_key_header" {
-  type    = string
-  default = "X-CloudFront-Auth-Key"
+  type        = string
+  description = "The authentication key header used to proxy requests to origin"
+  default     = "X-CloudFront-Auth-Key"
+}
+
+variable "admin_password" {
+  type        = string
+  description = "The password which is used to login to the admin system"
 }
