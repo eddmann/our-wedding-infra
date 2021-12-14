@@ -23,3 +23,18 @@ variable "mailer_dsn" {
   type        = string
   description = "The desired Symfony Mailer DSN used for sending email"
 }
+
+variable "email_notifier_to" {
+  type        = list(string)
+  description = "The addresses to send email notifications to"
+}
+
+variable "email_notifier_from" {
+  type        = string
+  description = "The address to send email notifications from"
+}
+
+variable "page_content" {
+  type        = map(string)
+  description = "The content displayed within the defined site sections"
+}
