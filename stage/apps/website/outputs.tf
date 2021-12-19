@@ -1,6 +1,7 @@
-output "deploy_role" {
+output "deploy_user" {
+  sensitive = true
   value = {
-    arn         = aws_iam_role.deploy.arn,
-    external_id = random_string.deploy_external_id.result
+    access_key_id     = aws_iam_access_key.deploy.id
+    secret_access_key = aws_iam_access_key.deploy.secret
   }
 }
