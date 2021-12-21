@@ -5,8 +5,7 @@ resource "aws_s3_bucket" "assets" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = data.terraform_remote_state.security.outputs.s3_kms_key.arn
-        sse_algorithm     = "aws:kms"
+        sse_algorithm = "AES256"
       }
     }
   }
@@ -27,7 +26,10 @@ resource "aws_cloudfront_origin_access_identity" "assets" {
   comment = format("our-wedding-%s-website-assets", local.stage)
 }
 
-# https://aws-blog.de/2020/09/enforcing-encryption-standards-on-s3-objects.html
+# We would enforce SSE-KMS here, but S3 buckets fronted by CloudFront require
+# a Request function to handle decrypting these assets. As such we have opted
+# for SSE-S3.
+# Reference: https://aws-blog.de/2020/09/enforcing-encryption-standards-on-s3-objects.html
 resource "aws_s3_bucket_policy" "assets" {
   bucket = aws_s3_bucket.assets.id
 
@@ -50,21 +52,10 @@ resource "aws_s3_bucket_policy" "assets" {
           "Resource": "${aws_s3_bucket.assets.arn}/*",
           "Condition": {
             "StringNotEquals": {
-              "s3:x-amz-server-side-encryption": "aws:kms"
+              "s3:x-amz-server-side-encryption": "AES256"
             },
             "Null": {
               "s3:x-amz-server-side-encryption": "false"
-            }
-          }
-        },
-        {
-          "Effect": "Deny",
-          "Principal": "*",
-          "Action": "s3:PutObject",
-          "Resource": "${aws_s3_bucket.assets.arn}/*",
-          "Condition": {
-            "StringNotEqualsIfExists": {
-              "s3:x-amz-server-side-encryption-aws-kms-key-id": "${data.terraform_remote_state.security.outputs.s3_kms_key.arn}"
             }
           }
         }
