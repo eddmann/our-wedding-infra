@@ -63,3 +63,10 @@ resource "aws_route53_record" "www" {
     evaluate_target_health = true
   }
 }
+
+resource "aws_ssm_parameter" "host" {
+  type  = "String"
+  name  = format("/our-wedding/%s/apps/website/host", local.stage)
+  value = data.aws_route53_zone.app.name
+  tags  = local.tags
+}
