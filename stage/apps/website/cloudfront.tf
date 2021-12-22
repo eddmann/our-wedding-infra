@@ -1,3 +1,22 @@
+resource "aws_cloudfront_origin_request_policy" "website" {
+  name = "Our-Wedding-Website"
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
+
+  headers_config {
+    header_behavior = "whitelist"
+    headers {
+      items = ["Accept", "Accept-Language", "Accept-Datetime", "Accept-Charset", "Origin", "Referer", "User-Agent"]
+    }
+  }
+
+  query_strings_config {
+    query_string_behavior = "all"
+  }
+}
+
 resource "aws_cloudfront_distribution" "website" {
   enabled         = true
   is_ipv6_enabled = true
@@ -15,6 +34,7 @@ resource "aws_cloudfront_distribution" "website" {
     cached_methods             = ["GET", "HEAD"]
     viewer_protocol_policy     = "redirect-to-https"
     cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+    origin_request_policy_id   = aws_cloudfront_origin_request_policy.website.id
     response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03" # SecurityHeadersPolicy
   }
 
