@@ -1,3 +1,7 @@
+# We would enforce SSE-KMS here, but S3 buckets fronted by CloudFront require
+# a Request function to handle decrypting these assets. As such we have opted
+# for SSE-S3.
+
 resource "aws_s3_bucket" "assets" {
   bucket_prefix = format("our-wedding-%s-website-assets-", local.stage)
   acl           = "private"
@@ -26,9 +30,6 @@ resource "aws_cloudfront_origin_access_identity" "assets" {
   comment = format("our-wedding-%s-website-assets", local.stage)
 }
 
-# We would enforce SSE-KMS here, but S3 buckets fronted by CloudFront require
-# a Request function to handle decrypting these assets. As such we have opted
-# for SSE-S3.
 # Reference: https://aws-blog.de/2020/09/enforcing-encryption-standards-on-s3-objects.html
 resource "aws_s3_bucket_policy" "assets" {
   bucket = aws_s3_bucket.assets.id
