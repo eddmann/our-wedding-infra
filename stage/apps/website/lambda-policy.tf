@@ -10,7 +10,8 @@ resource "aws_iam_policy" "website" {
           "Action": [
             "dynamodb:PutItem",
             "dynamodb:UpdateItem",
-            "dynamodb:GetItem"
+            "dynamodb:GetItem",
+            "dynamodb:DeleteItem"
           ],
           "Resource": "${aws_dynamodb_table.sessions.arn}"
         },
