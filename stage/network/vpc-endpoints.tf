@@ -1,3 +1,6 @@
+#
+# SQS
+#
 resource "aws_vpc_endpoint" "sqs" {
   count = contains(var.vpc_endpoints, "sqs") ? 1 : 0
 
@@ -11,6 +14,9 @@ resource "aws_vpc_endpoint" "sqs" {
   tags = local.tags
 }
 
+#
+# Secrets Manager
+#
 resource "aws_vpc_endpoint" "secretsmanager" {
   count = contains(var.vpc_endpoints, "secretsmanager") ? 1 : 0
 
@@ -24,6 +30,9 @@ resource "aws_vpc_endpoint" "secretsmanager" {
   tags = local.tags
 }
 
+#
+# DynamoDB
+#
 resource "aws_vpc_endpoint" "dynamodb" {
   count = contains(var.vpc_endpoints, "dynamodb") ? 1 : 0
 
