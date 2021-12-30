@@ -14,6 +14,13 @@ variable "cidr_block" {
   description = "The IP address range used within the VPC"
 }
 
+
+variable "vpc_endpoints" {
+  type        = list(string)
+  description = "Endpoints you wish to configure within the VPC"
+  default     = ["sqs", "secretsmanager", "dynamodb"]
+}
+
 variable "app_names" {
   type        = list(string)
   description = "The name of the apps which compose this service stage"
