@@ -32,6 +32,9 @@ resource "aws_secretsmanager_secret_version" "auto_generated" {
   secret_string = random_password.auto_generated[each.key].result
 }
 
+#
+# Admin password
+#
 resource "aws_secretsmanager_secret" "admin_password" {
   kms_key_id = data.terraform_remote_state.security.outputs.secrets_manager_kms_key.id
 
@@ -44,6 +47,9 @@ resource "aws_secretsmanager_secret_version" "admin_password" {
   secret_string = var.admin_password
 }
 
+#
+# Mailer DSN
+#
 resource "aws_secretsmanager_secret" "mailer_dsn" {
   kms_key_id = data.terraform_remote_state.security.outputs.secrets_manager_kms_key.id
 

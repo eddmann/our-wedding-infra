@@ -2,9 +2,7 @@ resource "aws_iam_user" "deploy" {
   name = format("our-wedding-website-%s-deploy", local.stage)
   path = format("/ourwedding/%s/", local.stage)
 
-  tags = merge(local.tags, {
-    Application = "Website"
-  })
+  tags = local.tags
 }
 
 resource "aws_iam_access_key" "deploy" {
