@@ -14,6 +14,17 @@ variable "cidr_block" {
   description = "The IP address range used within the VPC"
 }
 
+variable "nat_availability_zone" {
+  type        = string
+  description = "The AZ you wish to place the NAT instance for private subnet outbound internet access"
+  default     = "a"
+}
+
+variable "nat_spot_instance_types" {
+  type        = list(string)
+  description = "Spot-based EC2 instance types used for the NAT instance"
+  default     = ["t3.nano", "t3a.nano"]
+}
 
 variable "vpc_endpoints" {
   type        = list(string)
