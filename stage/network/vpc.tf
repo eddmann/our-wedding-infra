@@ -1,12 +1,12 @@
 locals {
-  name = format("our-wedding-%s", local.stage)
+  vpc_name = format("our-wedding-%s", local.stage)
 }
 
 resource "aws_vpc" "main" {
   cidr_block           = var.cidr_block
   enable_dns_hostnames = true
 
-  tags = merge(local.tags, { Name = local.name })
+  tags = merge(local.tags, { Name = local.vpc_name })
 }
 
 #
@@ -15,7 +15,7 @@ resource "aws_vpc" "main" {
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
-  tags = merge(local.tags, { Name = local.name })
+  tags = merge(local.tags, { Name = local.vpc_name })
 }
 
 #
@@ -24,7 +24,7 @@ resource "aws_internet_gateway" "main" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
-  tags = merge(local.tags, { Name = format("%s-public", local.name) })
+  tags = merge(local.tags, { Name = format("%s-public", local.vpc_name) })
 }
 
 resource "aws_route" "internet_gateway" {
@@ -48,7 +48,7 @@ resource "aws_route_table" "private" {
 
   vpc_id = aws_vpc.main.id
 
-  tags = merge(local.tags, { Name = format("%s-private-%s", local.name, element(var.availability_zones, count.index)) })
+  tags = merge(local.tags, { Name = format("%s-private-%s", local.vpc_name, element(var.availability_zones, count.index)) })
 }
 
 resource "aws_route_table_association" "private" {
@@ -69,7 +69,7 @@ resource "aws_subnet" "public" {
   availability_zone       = "${var.aws_region}${element(var.availability_zones, count.index)}"
   map_public_ip_on_launch = true
 
-  tags = merge(local.tags, { Name = format("%s-public-%s", local.name, element(var.availability_zones, count.index)) })
+  tags = merge(local.tags, { Name = format("%s-public-%s", local.vpc_name, element(var.availability_zones, count.index)) })
 }
 
 resource "aws_subnet" "private" {
@@ -79,7 +79,7 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 100)
   availability_zone = "${var.aws_region}${element(var.availability_zones, count.index)}"
 
-  tags = merge(local.tags, { Name = format("%s-private-%s", local.name, element(var.availability_zones, count.index)) })
+  tags = merge(local.tags, { Name = format("%s-private-%s", local.vpc_name, element(var.availability_zones, count.index)) })
 }
 
 #
