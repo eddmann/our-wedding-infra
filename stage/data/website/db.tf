@@ -29,10 +29,12 @@ resource "aws_rds_cluster" "website" {
   engine_mode    = "serverless"
   engine_version = "10.14"
 
-  deletion_protection     = false
-  copy_tags_to_snapshot   = true
-  skip_final_snapshot     = true
-  apply_immediately       = true
+  deletion_protection   = false
+  copy_tags_to_snapshot = true
+  skip_final_snapshot   = true
+  apply_immediately     = true
+
+  #tfsec:ignore:aws-rds-backup-retention-specified
   backup_retention_period = 1
 
   kms_key_id        = data.terraform_remote_state.security.outputs.rds_kms_key.arn

@@ -2,6 +2,8 @@
 # a Request function to handle decrypting these assets. As such we have opted
 # for SSE-S3.
 
+#tfsec:ignore:aws-s3-enable-versioning
+#tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "assets" {
   bucket_prefix = format("our-wedding-%s-website-assets-", local.stage)
   acl           = "private"

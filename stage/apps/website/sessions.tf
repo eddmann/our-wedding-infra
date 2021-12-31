@@ -2,6 +2,7 @@ locals {
   sessions_table_name = format("our-wedding-%s-website-sessions", local.stage)
 }
 
+#tfsec:ignore:aws-dynamodb-enable-recovery
 resource "aws_dynamodb_table" "sessions" {
   name         = local.sessions_table_name
   billing_mode = "PAY_PER_REQUEST"

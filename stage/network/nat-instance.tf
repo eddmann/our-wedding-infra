@@ -15,6 +15,7 @@ resource "aws_security_group" "nat_instance" {
   tags = local.tags
 }
 
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
 resource "aws_security_group_rule" "egress" {
   security_group_id = aws_security_group.nat_instance.id
   type              = "egress"
@@ -22,6 +23,7 @@ resource "aws_security_group_rule" "egress" {
   from_port         = 0
   to_port           = 65535
   protocol          = "tcp"
+  description       = "Permit all outbound requests"
 }
 
 resource "aws_security_group_rule" "ingress_any" {
@@ -31,6 +33,7 @@ resource "aws_security_group_rule" "ingress_any" {
   from_port         = 0
   to_port           = 65535
   protocol          = "all"
+  description       = "Permit all private subnet requests"
 }
 
 resource "aws_network_interface" "nat_instance" {
@@ -116,6 +119,7 @@ resource "aws_iam_role_policy_attachment" "nat_instance_ssm" {
   role       = aws_iam_role.nat_instance.name
 }
 
+#tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role_policy" "nat_instance_eni" {
   role        = aws_iam_role.nat_instance.name
   name_prefix = local.nat_name_prefix

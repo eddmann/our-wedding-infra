@@ -10,6 +10,10 @@ resource "aws_acm_certificate" "apex" {
 
   validation_method = "DNS"
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = local.tags
 }
 

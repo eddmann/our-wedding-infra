@@ -9,6 +9,7 @@ resource "aws_iam_access_key" "deploy" {
   user = aws_iam_user.deploy.name
 }
 
+# These permissions should be reduced
 resource "aws_iam_user_policy_attachment" "deploy" {
   user       = aws_iam_user.deploy.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"

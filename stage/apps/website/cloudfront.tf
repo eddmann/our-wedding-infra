@@ -6,7 +6,7 @@ resource "aws_cloudfront_function" "www_redirect" {
 }
 
 resource "aws_cloudfront_origin_request_policy" "website" {
-  name = "Our-Wedding-Website"
+  name = format("our-wedding-website-%s", local.stage)
 
   cookies_config {
     cookie_behavior = "all"
@@ -24,6 +24,8 @@ resource "aws_cloudfront_origin_request_policy" "website" {
   }
 }
 
+#tfsec:ignore:aws-cloudfront-enable-waf
+#tfsec:ignore:aws-cloudfront-enable-logging
 resource "aws_cloudfront_distribution" "website" {
   enabled         = true
   is_ipv6_enabled = true
