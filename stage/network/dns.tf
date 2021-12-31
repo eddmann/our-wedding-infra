@@ -3,14 +3,14 @@ data "aws_route53_zone" "stage" {
 }
 
 resource "aws_route53_zone" "app" {
-  for_each = toset(var.app_names)
+  for_each = var.app_names
 
   name = format("%s.%s", each.value, data.aws_route53_zone.stage.name)
   tags = local.tags
 }
 
 resource "aws_route53_record" "app_ns" {
-  for_each = toset(var.app_names)
+  for_each = var.app_names
 
   zone_id = data.aws_route53_zone.stage.zone_id
   name    = aws_route53_zone.app[each.value].name

@@ -4,7 +4,7 @@ variable "TFC_WORKSPACE_NAME" {
 }
 
 variable "availability_zones" {
-  type        = list(string)
+  type        = set(string)
   description = "List of availability zones you wish to provision VPC subnets in"
   default     = ["a", "b"]
 }
@@ -21,18 +21,18 @@ variable "nat_availability_zone" {
 }
 
 variable "nat_spot_instance_types" {
-  type        = list(string)
+  type        = set(string)
   description = "Spot-based EC2 instance types used for the NAT instance"
   default     = ["t3.nano", "t3a.nano"]
 }
 
 variable "vpc_endpoints" {
-  type        = list(string)
+  type        = set(string)
   description = "Endpoints you wish to configure within the VPC"
   default     = ["sqs", "secretsmanager", "dynamodb"]
 }
 
 variable "app_names" {
-  type        = list(string)
+  type        = set(string)
   description = "The name of the apps which compose this service stage"
 }

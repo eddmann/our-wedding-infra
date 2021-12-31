@@ -1,5 +1,5 @@
 locals {
-  nat_public_subnet_id = element(aws_subnet.public.*.id, index(var.availability_zones, var.nat_availability_zone))
+  nat_public_subnet_id = aws_subnet.public[var.nat_availability_zone].id
   nat_name             = format("our-wedding-%s", local.stage)
   nat_name_prefix      = format("our-wedding-%s-nat-", local.stage)
 }
@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "egress" {
 resource "aws_security_group_rule" "ingress_any" {
   security_group_id = aws_security_group.nat_instance.id
   type              = "ingress"
-  cidr_blocks       = aws_subnet.private.*.cidr_block
+  cidr_blocks       = [for s in aws_subnet.private : s.cidr_block]
   from_port         = 0
   to_port           = 65535
   protocol          = "all"
@@ -53,8 +53,9 @@ resource "aws_eip" "nat_instance" {
 }
 
 resource "aws_route" "nat_instance" {
-  count                  = length(var.availability_zones)
-  route_table_id         = element(aws_route_table.private.*.id, count.index)
+  for_each = var.availability_zones
+
+  route_table_id         = aws_route_table.private[each.value].id
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = aws_network_interface.nat_instance.id
 }

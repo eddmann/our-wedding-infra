@@ -7,7 +7,7 @@ resource "aws_vpc_endpoint" "sqs" {
   vpc_id              = aws_vpc.main.id
   service_name        = format("com.amazonaws.%s.sqs", var.aws_region)
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = aws_subnet.private.*.id
+  subnet_ids          = [for s in aws_subnet.private : s.id]
   security_group_ids  = [aws_vpc.main.default_security_group_id]
   private_dns_enabled = true
 
@@ -23,7 +23,7 @@ resource "aws_vpc_endpoint" "secretsmanager" {
   vpc_id              = aws_vpc.main.id
   service_name        = format("com.amazonaws.%s.secretsmanager", var.aws_region)
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = aws_subnet.private.*.id
+  subnet_ids          = [for s in aws_subnet.private : s.id]
   security_group_ids  = [aws_vpc.main.default_security_group_id]
   private_dns_enabled = true
 
@@ -44,8 +44,8 @@ resource "aws_vpc_endpoint" "dynamodb" {
 }
 
 resource "aws_vpc_endpoint_route_table_association" "dynamodb" {
-  count = contains(var.vpc_endpoints, "dynamodb") ? length(var.availability_zones) : 0
+  for_each = contains(var.vpc_endpoints, "dynamodb") ? var.availability_zones : []
 
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb[0].id
-  route_table_id  = element(aws_route_table.private.*.id, count.index)
+  route_table_id  = aws_route_table.private[each.value].id
 }

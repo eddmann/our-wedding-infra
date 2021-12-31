@@ -34,9 +34,9 @@ resource "aws_route" "internet_gateway" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = length(var.availability_zones)
+  for_each = var.availability_zones
 
-  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  subnet_id      = aws_subnet.public[each.value].id
   route_table_id = aws_route_table.public.id
 }
 
@@ -44,42 +44,42 @@ resource "aws_route_table_association" "public" {
 # Private routes
 #
 resource "aws_route_table" "private" {
-  count = length(var.availability_zones)
+  for_each = var.availability_zones
 
   vpc_id = aws_vpc.main.id
 
-  tags = merge(local.tags, { Name = format("%s-private-%s", local.vpc_name, element(var.availability_zones, count.index)) })
+  tags = merge(local.tags, { Name = format("%s-private-%s", local.vpc_name, each.value) })
 }
 
 resource "aws_route_table_association" "private" {
-  count = length(var.availability_zones)
+  for_each = var.availability_zones
 
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
-  route_table_id = element(aws_route_table.private.*.id, count.index)
+  subnet_id      = aws_subnet.private[each.value].id
+  route_table_id = aws_route_table.private[each.value].id
 }
 
 #
 # Subnets
 #
 resource "aws_subnet" "public" {
-  count = length(var.availability_zones)
+  for_each = var.availability_zones
 
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.cidr_block, 8, count.index)
-  availability_zone       = "${var.aws_region}${element(var.availability_zones, count.index)}"
+  cidr_block              = cidrsubnet(var.cidr_block, 8, index(tolist(var.availability_zones), each.value))
+  availability_zone       = "${var.aws_region}${each.value}"
   map_public_ip_on_launch = true
 
-  tags = merge(local.tags, { Name = format("%s-public-%s", local.vpc_name, element(var.availability_zones, count.index)) })
+  tags = merge(local.tags, { Name = format("%s-public-%s", local.vpc_name, each.value) })
 }
 
 resource "aws_subnet" "private" {
-  count = length(var.availability_zones)
+  for_each = var.availability_zones
 
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 100)
-  availability_zone = "${var.aws_region}${element(var.availability_zones, count.index)}"
+  cidr_block        = cidrsubnet(var.cidr_block, 8, index(tolist(var.availability_zones), each.value) + 100)
+  availability_zone = "${var.aws_region}${each.value}"
 
-  tags = merge(local.tags, { Name = format("%s-private-%s", local.vpc_name, element(var.availability_zones, count.index)) })
+  tags = merge(local.tags, { Name = format("%s-private-%s", local.vpc_name, each.value) })
 }
 
 #
@@ -96,7 +96,7 @@ resource "aws_ssm_parameter" "default_security_group_id" {
 resource "aws_ssm_parameter" "private_subnet_ids" {
   type  = "StringList"
   name  = format("/our-wedding/%s/network/private-subnet-ids", local.stage)
-  value = join(",", aws_subnet.private.*.id)
+  value = join(",", [for s in aws_subnet.private : s.id])
 
   tags = local.tags
 }
