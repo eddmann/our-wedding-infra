@@ -4,14 +4,12 @@ TFLINT_VERSION := v0.33.2.0
 TFSEC_VERSION := v0.63.1
 TFDOCS_VERSION := 0.16.0
 
-.PHONY: format
-format: ## Apply formatting rules
-	@terraform fmt -recursive
-
 .PHONY: lint
-lint: ## Run checks based on `tflint` rules
+lint: ## Run checks based on `tffmt` and `tflint` rules
+	@terraform fmt -check=true -diff=true -recursive
 	@docker run --rm \
 	  -v "$(PWD):/app" \
+	  -w /app \
 	  --entrypoint= \
 	  ghcr.io/terraform-linters/tflint-bundle:$(TFLINT_VERSION) \
 	  sh -c "find . -type f -name variables.tf -exec dirname {} \; | xargs -I {} tflint -c /app/.tflint.hcl {}"
@@ -20,6 +18,13 @@ lint: ## Run checks based on `tflint` rules
 security: ## Run checks based on `tfsec` rules
 	@docker run --rm -v "$(PWD):/app" aquasec/tfsec:$(TFSEC_VERSION) /app
 
+.PHONY: can-release
+can-release: lint security ## Ensure code meets release requirements
+
+.PHONY: format
+format: ## Apply formatting rules
+	@terraform fmt -recursive
+
 .PHONY: documentation
 documentation: ## Generate documentation using `terraform-docs`
 	@docker run --rm \
@@ -27,9 +32,6 @@ documentation: ## Generate documentation using `terraform-docs`
 	  --entrypoint= \
 	  quay.io/terraform-docs/terraform-docs:$(TFDOCS_VERSION) \
 	  sh -c "find . -type f -name variables.tf -exec dirname {} \; | xargs -I {} terraform-docs -c /app/.terraform-docs.yml {}"
-
-.PHONY: can-release
-can-release: lint security ## Ensure code meets release requirements
 
 # https://blog.thapaliya.com/posts/well-documented-makefiles/
 .PHONY: help
