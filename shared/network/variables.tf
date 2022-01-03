@@ -4,7 +4,7 @@ variable "root_domain_name" {
 }
 
 variable "stages" {
-  type        = list(string)
+  type        = set(string)
   default     = ["staging", "prod"]
   description = "The stages that are present for this service"
 }
