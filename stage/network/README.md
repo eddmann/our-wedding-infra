@@ -68,15 +68,15 @@ _Note:_ The NAT-instance can be accessed by using [AWS Systems Manager Session M
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_TFC_WORKSPACE_NAME"></a> [TFC\_WORKSPACE\_NAME](#input\_TFC\_WORKSPACE\_NAME) | Provided by Terraform Cloud so as to determine the stage | `string` | n/a | yes |
-| <a name="input_app_names"></a> [app\_names](#input\_app\_names) | The name of the apps which compose this service stage | `list(string)` | n/a | yes |
-| <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | List of availability zones you wish to provision VPC subnets in | `list(string)` | <pre>[<br>  "a",<br>  "b"<br>]</pre> | no |
+| <a name="input_app_names"></a> [app\_names](#input\_app\_names) | The name of the apps which compose this service stage | `set(string)` | n/a | yes |
+| <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | List of availability zones you wish to provision VPC subnets in | `set(string)` | <pre>[<br>  "a",<br>  "b"<br>]</pre> | no |
 | <a name="input_aws_access_key_id"></a> [aws\_access\_key\_id](#input\_aws\_access\_key\_id) | n/a | `string` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | n/a | `string` | `"eu-west-1"` | no |
 | <a name="input_aws_secret_access_key"></a> [aws\_secret\_access\_key](#input\_aws\_secret\_access\_key) | n/a | `string` | n/a | yes |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | The IP address range used within the VPC | `string` | n/a | yes |
 | <a name="input_nat_availability_zone"></a> [nat\_availability\_zone](#input\_nat\_availability\_zone) | The AZ you wish to place the NAT instance for private subnet outbound internet access | `string` | `"a"` | no |
-| <a name="input_nat_spot_instance_types"></a> [nat\_spot\_instance\_types](#input\_nat\_spot\_instance\_types) | Spot-based EC2 instance types used for the NAT instance | `list(string)` | <pre>[<br>  "t3.nano",<br>  "t3a.nano"<br>]</pre> | no |
-| <a name="input_vpc_endpoints"></a> [vpc\_endpoints](#input\_vpc\_endpoints) | Endpoints you wish to configure within the VPC | `list(string)` | <pre>[<br>  "sqs",<br>  "secretsmanager",<br>  "dynamodb"<br>]</pre> | no |
+| <a name="input_nat_spot_instance_types"></a> [nat\_spot\_instance\_types](#input\_nat\_spot\_instance\_types) | Spot-based EC2 instance types used for the NAT instance | `set(string)` | <pre>[<br>  "t3.nano",<br>  "t3a.nano"<br>]</pre> | no |
+| <a name="input_vpc_endpoints"></a> [vpc\_endpoints](#input\_vpc\_endpoints) | Endpoints you wish to configure within the VPC | `set(string)` | <pre>[<br>  "sqs",<br>  "secretsmanager",<br>  "dynamodb"<br>]</pre> | no |
 
 ## Outputs
 

@@ -30,7 +30,7 @@
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | n/a | `string` | `"eu-west-1"` | no |
 | <a name="input_aws_secret_access_key"></a> [aws\_secret\_access\_key](#input\_aws\_secret\_access\_key) | n/a | `string` | n/a | yes |
 | <a name="input_root_domain_name"></a> [root\_domain\_name](#input\_root\_domain\_name) | The root domain name which hosts the service | `string` | n/a | yes |
-| <a name="input_stages"></a> [stages](#input\_stages) | The stages that are present for this service | `list(string)` | <pre>[<br>  "staging",<br>  "prod"<br>]</pre> | no |
+| <a name="input_stages"></a> [stages](#input\_stages) | The stages that are present for this service | `set(string)` | <pre>[<br>  "staging",<br>  "prod"<br>]</pre> | no |
 
 ## Outputs
 
