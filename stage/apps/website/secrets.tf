@@ -61,3 +61,18 @@ resource "aws_secretsmanager_secret_version" "mailer_dsn" {
   secret_id     = aws_secretsmanager_secret.mailer_dsn.id
   secret_string = var.mailer_dsn
 }
+
+#
+# Page Content
+#
+resource "aws_secretsmanager_secret" "page_content" {
+  kms_key_id = data.terraform_remote_state.security.outputs.secrets_manager_kms_key.id
+
+  name = format("/our-wedding/%s/apps/website/page-content", local.stage)
+  tags = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "page_content" {
+  secret_id     = aws_secretsmanager_secret.page_content.id
+  secret_string = var.page_content
+}
