@@ -1,7 +1,7 @@
 resource "aws_ssm_parameter" "page_content" {
   type  = "String"
   name  = format("/our-wedding/%s/apps/website/page-content", local.stage)
-  value = jsonencode(var.page_content)
+  value = var.page_content
   tags  = local.tags
 }
 

@@ -35,6 +35,6 @@ variable "email_notifier_from" {
 }
 
 variable "page_content" {
-  type        = map(string)
+  type        = string
   description = "The content displayed within the defined site sections"
 }
