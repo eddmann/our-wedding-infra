@@ -32,10 +32,7 @@ resource "aws_cloudfront_distribution" "website" {
   price_class     = "PriceClass_100"
   http_version    = "http2"
 
-  aliases = [
-    data.aws_route53_zone.app.name,
-    format("www.%s", data.aws_route53_zone.app.name)
-  ]
+  aliases = concat(local.app_domains, local.vanity_domains)
 
   default_cache_behavior {
     target_origin_id           = "Website"
@@ -108,7 +105,7 @@ resource "aws_cloudfront_distribution" "website" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate_validation.apex.certificate_arn
+    acm_certificate_arn      = aws_acm_certificate_validation.app.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }

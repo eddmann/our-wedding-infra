@@ -38,3 +38,9 @@ variable "page_content" {
   type        = string
   description = "The content displayed within the defined site sections"
 }
+
+variable "vanity_dns_zone_id" {
+  type        = string
+  description = "Optional, primary DNS zone to configure, used for customer-facing domains"
+  default     = null
+}
