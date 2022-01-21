@@ -1,5 +1,12 @@
 # Stage - Website Data
 
+This project manages resources related to the _Website_ applications data concerns within a stage-environment.
+Currently, it is only responsible for the Serverless Aurora (PostgreSQL) database used within the runtime for persistent application state.
+
+The long-term persistent data requirements are split from the application runtime as the two have different rates of change.
+To expand upon this; resources found in the application runtime project can be re-created from scratch with minimal long-term impact (their data concerns are transisant in nature).
+However, resources found in this project can not be easily recreated from strach, as in doing so we would lose state that is non-recoverable and vital to the overall applications health.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

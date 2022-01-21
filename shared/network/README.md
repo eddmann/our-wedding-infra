@@ -1,5 +1,10 @@
 # Shared - Network
 
+This project manages resources related to communication and networking which are _shared_ across all the provisioned stage environments.
+The project is responsible for the root and stage-based sub-domain (i.e. `stage-env.root.com`) Route53 hosted zones.
+The root hosted zone delegates management of the sub-domain records using Name server (NS) records to each stage environment.
+These stage environment hosted zones are exposed as Terraform project outputs, with all zone entries subsequently managed within the stage-based projects.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

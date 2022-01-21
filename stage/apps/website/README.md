@@ -1,5 +1,40 @@
 # Stage - Website App
 
+This project manages resources related to the _Website_ applications runtime concerns within a stage-environment.
+
+The project manages the following:
+
+- S3 Bucket for storing compiled static assets used within the application.
+  Upon each application deployment this bucket is synced with the latest compiled assets (handled by the CI pipline).
+- CloudFront distribution used to front both the static asset S3 bucket (with according PoP caching) and the API-gateway provisioned/managed by the application itself.
+  This single distribution allows us to host both the application and static assets from the same domain (asset requests being found at the `/build` path prefix) which is best practise.
+  As we want all traffic to be sent via the distribution we lock down the publicly accessible API-gateway using a pre-shared key, guarded at the application layer (front-controller).
+  We also include a CloudFront function which is used to manage _www_ to _apex_ URL redirects, which is easier to manage than a dedicated ALB/S3 bucket alternative approach.
+- Managed SSL certificates (via ACM) and assoicated Route 53 records for the given applications CloudFront distribution.
+- DynamoDB table for application session state (with record TTLs for self-cleaning).
+- SQS woker queue (and associated dead-letter queue) used by the application to handle asynchronous compute workloads.
+- Lambda runtime permission policy which includes all permissions required by the runtime to use resources provisioned in this project.
+- Runtime secrets and parameters shared with the application itself using SSM and Secrets Manager.
+  Only knowledge shared with the application that is deemeed secret is stored within Secrets Manager.
+  Secret values are pulled in at runtime (with explicit auditing in-place), as such, they incur a larger performance cost than SSM parameters which are baked into the Lambda runtime configuration.
+- IAM user with required permissions to deploy the application itself.
+  This is used within the application CI pipeline (GitHub workflows) to deploy the desired build within the stage-envioronemnt.
+
+_Note_: Typically, knowledge sharing between Terraform and the appliication itself is unidirectional.
+However, the CloudFront distribution does require knowledge of the desired application API-gateway resource.
+This leads to a chicken and egg scenario, where-by which set of resources should your provisioned first.
+It is advised to provision the resources found in this project first (with a dummy API-gateway parameter), and then upon successful deployment replace with the generated API-gateway.
+
+## Resource seperation
+
+The rule currently employed within this _service_ is any application runtime concern which does not change based on a CI pipeline deployment (i.e. Lambda function/API-gateway) should be managed within Terraform.
+This is due to the size of the service, and being owned by a single individual.
+
+An alternative way of seperating runtime resources between the application itself (Serverless Framework) and Terraform is based on stake-holder ownership.
+This is best employed in a large, multidisciplinary team setting.
+For example, the foundational infrastructure may be owned and managed by the Operations/SRE team, with the runtime/code required to run the application being owned by the Development team.
+The Development team can depend on infrastructure setup by the Operations/SRE team via Secrets Manager secrets and SSM parameters.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -22,8 +57,8 @@
 
 | Name | Type |
 |------|------|
-| [aws_acm_certificate.apex](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
-| [aws_acm_certificate_validation.apex](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
+| [aws_acm_certificate.app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudfront_distribution.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_cloudfront_function.www_redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_function) | resource |
 | [aws_cloudfront_origin_access_identity.assets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_identity) | resource |
@@ -33,18 +68,23 @@
 | [aws_iam_policy.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_user.deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy_attachment.deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy_attachment) | resource |
-| [aws_route53_record.apex](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
-| [aws_route53_record.apex_cert_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
-| [aws_route53_record.www](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.app_apex](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.app_cert_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.app_www](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.vanity_apex](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.vanity_cert_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.vanity_www](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_s3_bucket.assets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_policy.assets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_public_access_block.assets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_secretsmanager_secret.admin_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.auto_generated](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.mailer_dsn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.page_content](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.admin_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.auto_generated](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.mailer_dsn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.page_content](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_sqs_queue.worker](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
 | [aws_sqs_queue.worker_dlq](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
 | [aws_ssm_parameter.assets_bucket_name](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
@@ -52,7 +92,6 @@
 | [aws_ssm_parameter.email_notifier_to](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.origin_domain_auth_key_header](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
-| [aws_ssm_parameter.page_content](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.sessions_table_name](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.website_policy_arn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.worker_queue_arn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
@@ -60,6 +99,7 @@
 | [random_password.auto_generated](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_route53_zone.app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
+| [aws_route53_zone.vanity](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [terraform_remote_state.network](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 | [terraform_remote_state.security](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
@@ -77,7 +117,8 @@
 | <a name="input_mailer_dsn"></a> [mailer\_dsn](#input\_mailer\_dsn) | The desired Symfony Mailer DSN used for sending email | `string` | n/a | yes |
 | <a name="input_origin_domain_auth_key_header"></a> [origin\_domain\_auth\_key\_header](#input\_origin\_domain\_auth\_key\_header) | The authentication key header used to proxy requests to origin | `string` | `"X-CloudFront-Auth-Key"` | no |
 | <a name="input_origin_domain_name"></a> [origin\_domain\_name](#input\_origin\_domain\_name) | The API-GW domain name which hosts the Website | `string` | n/a | yes |
-| <a name="input_page_content"></a> [page\_content](#input\_page\_content) | The content displayed within the defined site sections | `map(string)` | n/a | yes |
+| <a name="input_page_content"></a> [page\_content](#input\_page\_content) | The content displayed within the defined site sections | `string` | n/a | yes |
+| <a name="input_vanity_dns_zone_id"></a> [vanity\_dns\_zone\_id](#input\_vanity\_dns\_zone\_id) | Optional, primary DNS zone to configure, used for customer-facing domains | `string` | `null` | no |
 
 ## Outputs
 

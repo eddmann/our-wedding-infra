@@ -1,15 +1,16 @@
 # Stage - Network
 
-This provides the foundational stage-based networking infrastructure required to run the defined applications.
+This project provides the foundational stage-environment networking infrastructure required to run the defined applications.
 
-The project creates the following:
+The project manages the following:
 
-- VPC with public and private subnets (desired AZ's supplied by `var.availability_zones`)
-- Single spot-based NAT instance provisioned in the defined availability zone (`var.nat_availability_zone`), used for outbound internet access within the private subnets.
-- Stage-based Route53 hosted-zones for each application (i.e. `website.staging.*`), based on the domain supplied by the [shared-network](../../shared/network) project. This is used as a trade-off between reliablity (NAT Gateway handles multi-AZ and failover for you) and cost (a single spot-instance is very cheap).
-- Optional VPC endpoints for key AWS services (SQS, Secrets manager and DynamoDB), for improved reliability/security.
+- The isolated stage-environment VPC, with public and private subnets.
+- Single spot-based NAT instance provisioned in a defined availability zone - used for outbound internet access within the private subnets.
+  This is used as a trade-off between reliablity ([NAT gateways](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html) handle multi-AZ and failover for you) and cost (a single spot-instance is very cheap).
+- Stage-based Route53 hosted-zones for each application (i.e. `website.stage-env.root.com`), based on the domain supplied by the [shared-network](../../shared/network) project.
+- Optional, VPC endpoints for key AWS services (SQS, Secrets manager and DynamoDB) to improve reliability/security at runtime.
 
-_Note:_ The NAT-instance can be accessed by using [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html).
+_Note:_ The NAT-instance is not accessibly via SSH, but instead can be accessed by using [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html).
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

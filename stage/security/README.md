@@ -1,5 +1,9 @@
 # Stage - Security
 
+This project manages resources related to a given stage-environments security concerns.
+The project is responsible for managing the KMS keys which are exposed (via outputs) and used throughout other related stage-enviornment projects.
+Going forward, this project will also manage any other security related resources such as WAF/GuardDuty which are provisioned.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
