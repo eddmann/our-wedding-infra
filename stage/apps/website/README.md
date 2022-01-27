@@ -11,6 +11,7 @@ The project manages the following:
   As we want all traffic to be sent via the distribution we lock down the publicly accessible API-gateway using a pre-shared key, guarded at the application layer (front-controller).
   We also include a CloudFront function which is used to manage _www_ to _apex_ URL redirects, which is easier to manage than a dedicated ALB/S3 bucket alternative approach.
 - Managed SSL certificates (via ACM) and assoicated Route 53 records for the given applications CloudFront distribution.
+  An optional vanity Route53 hosted zone can be supplied, which is provisioned alongside the stage-environment hosted zone for customer-facing application access.
 - DynamoDB table for application session state (with record TTLs for self-cleaning).
 - SQS woker queue (and associated dead-letter queue) used by the application to handle asynchronous compute workloads.
 - Lambda runtime permission policy which includes all permissions required by the runtime to use resources provisioned in this project.

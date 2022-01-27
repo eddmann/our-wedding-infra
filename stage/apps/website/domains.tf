@@ -22,7 +22,7 @@ resource "aws_acm_certificate" "app" {
   provider = aws.us_east_1
 
   domain_name               = data.aws_route53_zone.app.name
-  subject_alternative_names = concat(local.app_domains, local.vanity_domains)
+  subject_alternative_names = [for domain in concat(local.app_domains, local.vanity_domains) : domain if domain != data.aws_route53_zone.app.name]
 
   validation_method = "DNS"
 
