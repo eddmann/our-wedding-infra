@@ -5,6 +5,36 @@ resource "aws_cloudfront_function" "www_redirect" {
   code    = file("${path.module}/resources/www-redirect.js")
 }
 
+# Replicates `CachingDisabled` managed cache policies, but includes `Authorization` header
+# https://aws.amazon.com/premiumsupport/knowledge-center/cloudfront-authorization-header/
+resource "aws_cloudfront_cache_policy" "website" {
+  name = format("our-wedding-website-%s", local.stage)
+
+  default_ttl = 0
+  max_ttl     = 1 # required to pass `Authorization` header
+  min_ttl     = 0
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+
+    headers_config {
+      header_behavior = "whitelist"
+      headers {
+        items = ["Authorization"]
+      }
+    }
+
+    enable_accept_encoding_brotli = false
+    enable_accept_encoding_gzip   = false
+  }
+}
+
 resource "aws_cloudfront_origin_request_policy" "website" {
   name = format("our-wedding-website-%s", local.stage)
 
@@ -39,7 +69,7 @@ resource "aws_cloudfront_distribution" "website" {
     allowed_methods            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods             = ["GET", "HEAD"]
     viewer_protocol_policy     = "redirect-to-https"
-    cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+    cache_policy_id            = aws_cloudfront_cache_policy.website.id
     origin_request_policy_id   = aws_cloudfront_origin_request_policy.website.id
     response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03" # SecurityHeadersPolicy
 
