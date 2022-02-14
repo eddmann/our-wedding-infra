@@ -125,12 +125,11 @@ resource "aws_cloudfront_distribution" "website" {
   }
 
   dynamic "custom_error_response" {
-    for_each = [400, 403, 403, 404, 405, 414, 416, 500, 501, 502, 503, 504]
+    for_each = [400, 403, 404, 405, 414, 416, 500, 501, 502, 503, 504]
 
     content {
       error_caching_min_ttl = 0
       error_code            = custom_error_response.value
-      response_code         = 0
     }
   }
 
