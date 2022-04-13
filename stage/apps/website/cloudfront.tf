@@ -1,8 +1,23 @@
-resource "aws_cloudfront_function" "www_redirect" {
-  name    = format("our-wedding-website-%s-www-redirect", local.stage)
+data "template_file" "viewer_request" {
+  template = file("${path.module}/resources/viewer-request.js")
+
+  vars = {
+    DOMAIN = local.has_vanity_domain ? data.aws_route53_zone.vanity.name : data.aws_route53_zone.app.name
+  }
+}
+
+resource "aws_cloudfront_function" "viewer_request" {
+  name    = format("our-wedding-website-%s-viewer-request", local.stage)
   runtime = "cloudfront-js-1.0"
   publish = true
-  code    = file("${path.module}/resources/www-redirect.js")
+  code    = data.template_file.viewer_request.rendered
+}
+
+resource "aws_cloudfront_function" "viewer_response" {
+  name    = format("our-wedding-website-%s-viewer-response", local.stage)
+  runtime = "cloudfront-js-1.0"
+  publish = true
+  code    = file("${path.module}/resources/viewer-response.js")
 }
 
 # Replicates `CachingDisabled` managed cache policies, but includes `Authorization` header
@@ -75,7 +90,12 @@ resource "aws_cloudfront_distribution" "website" {
 
     function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.www_redirect.arn
+      function_arn = aws_cloudfront_function.viewer_request.arn
+    }
+
+    function_association {
+      event_type   = "viewer-response"
+      function_arn = aws_cloudfront_function.viewer_response.arn
     }
   }
 
@@ -92,7 +112,12 @@ resource "aws_cloudfront_distribution" "website" {
 
     function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.www_redirect.arn
+      function_arn = aws_cloudfront_function.viewer_request.arn
+    }
+
+    function_association {
+      event_type   = "viewer-response"
+      function_arn = aws_cloudfront_function.viewer_response.arn
     }
   }
 

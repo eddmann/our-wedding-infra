@@ -1,10 +1,12 @@
+/**
+ * Ensure that the client is requesting the website from our desired canonical domain.
+ * If this is not the case redirect them to this domain.
+ */
 function handler(event) {
   var host =
-    (event.request.headers.host &&
-      event.request.headers.host.value) ||
-    '';
+    (event.request.headers.host && event.request.headers.host.value) || '';
 
-  if (host.indexOf('www.') !== 0) {
+  if (host.indexOf('${DOMAIN}') === 0) {
     return event.request;
   }
 
@@ -13,13 +15,12 @@ function handler(event) {
     .join('&');
 
   return {
-    statusCode: 302,
-    statusDescription: 'Found',
+    statusCode: 301,
+    statusDescription: 'Moved Permanently',
     headers: {
       location: {
         value:
-          'https://' +
-          host.substr(4) +
+          'https://${DOMAIN}' +
           event.request.uri +
           (queryString.length > 0 ? '?' + queryString : ''),
       },
