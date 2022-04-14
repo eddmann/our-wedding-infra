@@ -13,11 +13,57 @@ resource "aws_cloudfront_function" "viewer_request" {
   code    = data.template_file.viewer_request.rendered
 }
 
-resource "aws_cloudfront_function" "viewer_response" {
-  name    = format("our-wedding-website-%s-viewer-response", local.stage)
-  runtime = "cloudfront-js-1.0"
-  publish = true
-  code    = file("${path.module}/resources/viewer-response.js")
+resource "aws_iam_role" "origin_response" {
+  name = format("our-wedding-website-%s-origin-response", local.stage)
+
+  assume_role_policy = <<-POLICY
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": "sts:AssumeRole",
+          "Principal": {
+            "Service": [
+                "lambda.amazonaws.com",
+                "edgelambda.amazonaws.com"
+            ]
+          },
+          "Effect": "Allow"
+        }
+      ]
+    }
+  POLICY
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "origin_response" {
+  role       = aws_iam_role.origin_response.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "archive_file" "origin_response" {
+  type        = "zip"
+  output_path = "resources/origin-response.zip"
+
+  source {
+    filename = "index.js"
+    content  = file("resources/origin-response.js")
+  }
+}
+
+resource "aws_lambda_function" "origin_response" {
+  provider = aws.us_east_1
+
+  function_name    = format("our-wedding-website-%s-origin-response", local.stage)
+  filename         = "resources/origin-response.zip"
+  handler          = "index.handler"
+  runtime          = "nodejs14.x"
+  role             = aws_iam_role.origin_response.arn
+  source_code_hash = data.archive_file.origin_response.output_base64sha256
+  publish          = true
+
+  tags = local.tags
 }
 
 # Replicates `CachingDisabled` managed cache policies, but includes `Authorization` header
@@ -93,9 +139,9 @@ resource "aws_cloudfront_distribution" "website" {
       function_arn = aws_cloudfront_function.viewer_request.arn
     }
 
-    function_association {
-      event_type   = "viewer-response"
-      function_arn = aws_cloudfront_function.viewer_response.arn
+    lambda_function_association {
+      event_type = "origin-response"
+      lambda_arn = aws_lambda_function.origin_response.qualified_arn
     }
   }
 
@@ -115,9 +161,9 @@ resource "aws_cloudfront_distribution" "website" {
       function_arn = aws_cloudfront_function.viewer_request.arn
     }
 
-    function_association {
-      event_type   = "viewer-response"
-      function_arn = aws_cloudfront_function.viewer_response.arn
+    lambda_function_association {
+      event_type = "origin-response"
+      lambda_arn = aws_lambda_function.origin_response.qualified_arn
     }
   }
 

@@ -6,7 +6,7 @@ function handler(event) {
   var host =
     (event.request.headers.host && event.request.headers.host.value) || '';
 
-  if (host.indexOf('${DOMAIN}') === 0) {
+  if (host.startsWith('${DOMAIN}')) {
     return event.request;
   }
 
