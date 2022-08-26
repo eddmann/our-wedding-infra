@@ -8,12 +8,12 @@ locals {
 }
 
 terraform {
-  required_version = ">= 1.1.8"
+  required_version = ">= 1.2.8"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.9.0"
+      version = ">= 4.27.0"
     }
   }
 
