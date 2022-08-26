@@ -159,6 +159,10 @@ resource "aws_launch_template" "nat_instance" {
     tags          = local.tags
   }
 
+  metadata_options {
+    http_tokens = "required"
+  }
+
   user_data = base64encode(join("\n", [
     "#cloud-config",
     yamlencode({
