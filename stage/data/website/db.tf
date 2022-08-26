@@ -27,7 +27,7 @@ resource "aws_rds_cluster" "website" {
 
   engine         = "aurora-postgresql"
   engine_mode    = "serverless"
-  engine_version = "10.14"
+  engine_version = "10.18"
 
   deletion_protection   = false
   copy_tags_to_snapshot = true
