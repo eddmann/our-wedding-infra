@@ -31,6 +31,20 @@ resource "aws_s3_bucket_cors_configuration" "upload" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "upload" {
+  bucket = aws_s3_bucket.upload.id
+
+  rule {
+    id = "Cleanup"
+
+    expiration {
+      days = 7
+    }
+
+    status = "Enabled"
+  }
+}
+
 resource "aws_ssm_parameter" "upload_bucket_name" {
   type  = "String"
   name  = format("/our-wedding/%s/apps/gallery/upload-s3-bucket-name", local.stage)
