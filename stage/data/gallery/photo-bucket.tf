@@ -29,6 +29,30 @@ resource "aws_s3_bucket_public_access_block" "photo" {
   restrict_public_buckets = true
 }
 
+resource "aws_cloudfront_origin_access_identity" "photo" {
+  comment = format("our-wedding-%s-website-photo", local.stage)
+}
+
+resource "aws_s3_bucket_policy" "photo" {
+  bucket = aws_s3_bucket.photo.id
+
+  policy = <<-POLICY
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": "s3:GetObject",
+          "Resource": "${aws_s3_bucket.photo.arn}/*",
+          "Principal": {
+            "AWS": "${aws_cloudfront_origin_access_identity.photo.iam_arn}"
+          }
+        }
+      ]
+    }
+  POLICY
+}
+
 resource "aws_ssm_parameter" "photo_bucket_name" {
   type  = "String"
   name  = format("/our-wedding/%s/apps/gallery/photo-s3-bucket-name", local.stage)
@@ -38,5 +62,5 @@ resource "aws_ssm_parameter" "photo_bucket_name" {
 resource "aws_ssm_parameter" "photo_bucket_prefix" {
   type  = "String"
   name  = format("/our-wedding/%s/apps/gallery/photo-s3-bucket-prefix", local.stage)
-  value = "/photo"
+  value = "photo"
 }
