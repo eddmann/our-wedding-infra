@@ -25,8 +25,10 @@
 | [aws_s3_bucket.upload](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_acl.photo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_acl.upload](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
-| [aws_s3_bucket_cors_configuration.photo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_cors_configuration) | resource |
 | [aws_s3_bucket_cors_configuration.upload](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_cors_configuration) | resource |
+| [aws_s3_bucket_lifecycle_configuration.upload](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
+| [aws_s3_bucket_public_access_block.photo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
+| [aws_s3_bucket_public_access_block.upload](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_server_side_encryption_configuration.photo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
 | [aws_s3_bucket_server_side_encryption_configuration.upload](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
 | [aws_ssm_parameter.photo_bucket_name](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
@@ -50,5 +52,5 @@
 |------|-------------|
 | <a name="output_photo_bucket_arn"></a> [photo\_bucket\_arn](#output\_photo\_bucket\_arn) | n/a |
 | <a name="output_table_arn"></a> [table\_arn](#output\_table\_arn) | n/a |
-| <a name="output_upload_bucket_arn"></a> [upload\_bucket\_arn](#output\_upload\_bucket\_arn) | n/a |
+| <a name="output_upload_bucket"></a> [upload\_bucket](#output\_upload\_bucket) | n/a |
 <!-- END_TF_DOCS -->
