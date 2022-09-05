@@ -34,3 +34,9 @@ resource "aws_ssm_parameter" "photo_bucket_name" {
   name  = format("/our-wedding/%s/apps/gallery/photo-s3-bucket-name", local.stage)
   value = aws_s3_bucket.photo.id
 }
+
+resource "aws_ssm_parameter" "photo_bucket_prefix" {
+  type  = "String"
+  name  = format("/our-wedding/%s/apps/gallery/photo-s3-bucket-prefix", local.stage)
+  value = "/photo"
+}
