@@ -1,4 +1,4 @@
-output "photo_bucket_arn" {
+output "photo_bucket" {
   value = {
     arn         = aws_s3_bucket.photo.arn,
     domain_name = aws_s3_bucket.photo.bucket_regional_domain_name
