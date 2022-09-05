@@ -26,10 +26,10 @@ resource "aws_iam_policy" "gallery" {
             "s3:*"
           ],
           "Resource": [
-            "${data.terraform_remote_state.data.outputs.photo_bucket_arn}",
-            "${data.terraform_remote_state.data.outputs.photo_bucket_arn}/*",
-            "${data.terraform_remote_state.data.outputs.upload_bucket_arn}",
-            "${data.terraform_remote_state.data.outputs.upload_bucket_arn}/*"
+            "${data.terraform_remote_state.data.outputs.photo_bucket.arn}",
+            "${data.terraform_remote_state.data.outputs.photo_bucket.arn}/*",
+            "${data.terraform_remote_state.data.outputs.upload_bucket.arn}",
+            "${data.terraform_remote_state.data.outputs.upload_bucket.arn}/*"
           ]
         }
       ]
