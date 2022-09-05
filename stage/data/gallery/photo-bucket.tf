@@ -17,18 +17,16 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "photo" {
 
 resource "aws_s3_bucket_acl" "photo" {
   bucket = aws_s3_bucket.photo.id
-  acl    = "public-read"
+  acl    = "private"
 }
 
-resource "aws_s3_bucket_cors_configuration" "photo" {
+resource "aws_s3_bucket_public_access_block" "photo" {
   bucket = aws_s3_bucket.photo.id
 
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["PUT", "POST"]
-    allowed_origins = ["*"]
-    max_age_seconds = 3000
-  }
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_ssm_parameter" "photo_bucket_name" {
