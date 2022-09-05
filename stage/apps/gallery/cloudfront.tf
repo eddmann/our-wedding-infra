@@ -1,7 +1,3 @@
-resource "aws_cloudfront_origin_access_identity" "photo" {
-  comment = format("our-wedding-%s-gallery-photo", local.stage)
-}
-
 #tfsec:ignore:aws-cloudfront-enable-waf
 #tfsec:ignore:aws-cloudfront-enable-logging
 resource "aws_cloudfront_distribution" "gallery" {
@@ -77,7 +73,7 @@ resource "aws_cloudfront_distribution" "gallery" {
     domain_name = data.terraform_remote_state.data.outputs.photo_bucket.domain_name
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.photo.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.client.cloudfront_access_identity_path
     }
   }
 
