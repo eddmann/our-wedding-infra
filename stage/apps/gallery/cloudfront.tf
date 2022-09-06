@@ -8,6 +8,8 @@ resource "aws_cloudfront_distribution" "gallery" {
 
   aliases = concat(local.app_domains, local.vanity_domains)
 
+  default_root_object = "index.html"
+
   default_cache_behavior {
     target_origin_id           = "Client"
     allowed_methods            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
