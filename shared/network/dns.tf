@@ -19,3 +19,16 @@ resource "aws_route53_record" "stage_ns" {
   type    = "NS"
   ttl     = "300"
 }
+
+resource "aws_route53_zone" "gallery" {
+  name = format("photos.%s", var.root_domain_name)
+  tags = local.tags
+}
+
+resource "aws_route53_record" "gallery_ns" {
+  zone_id = aws_route53_zone.root.zone_id
+  name    = aws_route53_zone.gallery.name
+  records = aws_route53_zone.gallery.name_servers
+  type    = "NS"
+  ttl     = "300"
+}
