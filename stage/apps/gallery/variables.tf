@@ -19,3 +19,13 @@ variable "vanity_dns_zone_id" {
   description = "Optional, primary DNS zone to configure, used for customer-facing domains"
   default     = null
 }
+
+variable "gallery_username" {
+  type        = string
+  description = "The username used to access the gallery"
+}
+
+variable "gallery_password" {
+  type        = string
+  description = "The password used to access the gallery"
+}

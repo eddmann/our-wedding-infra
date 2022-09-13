@@ -1,3 +1,19 @@
+data "template_file" "viewer_request" {
+  template = file("${path.module}/resources/viewer-request.js")
+
+  vars = {
+    DOMAIN        = local.has_vanity_domain ? data.aws_route53_zone.vanity.name : data.aws_route53_zone.app.name
+    AUTHORIZATION = format("Basic %s", base64encode(format("%s:%s", var.gallery_username, var.gallery_password)))
+  }
+}
+
+resource "aws_cloudfront_function" "viewer_request" {
+  name    = format("our-wedding-gallery-%s-viewer-request", local.stage)
+  runtime = "cloudfront-js-1.0"
+  publish = true
+  code    = data.template_file.viewer_request.rendered
+}
+
 #tfsec:ignore:aws-cloudfront-enable-waf
 #tfsec:ignore:aws-cloudfront-enable-logging
 resource "aws_cloudfront_distribution" "gallery" {
@@ -18,6 +34,11 @@ resource "aws_cloudfront_distribution" "gallery" {
     cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
     origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # CORS-S3Origin
     response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03" # SecurityHeadersPolicy
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.viewer_request.arn
+    }
   }
 
   ordered_cache_behavior {
@@ -29,6 +50,11 @@ resource "aws_cloudfront_distribution" "gallery" {
     cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
     origin_request_policy_id   = "775133bc-15f2-49f9-abea-afb2e0bf67d2" # Elemental-MediaTailor-PersonalizedManifests
     response_headers_policy_id = "eaab4381-ed33-4a86-88ca-d9558dc6cd63" # CORS-with-preflight-and-SecurityHeadersPolicy
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.viewer_request.arn
+    }
   }
 
   ordered_cache_behavior {
@@ -40,6 +66,11 @@ resource "aws_cloudfront_distribution" "gallery" {
     cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
     origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # CORS-S3Origin
     response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03" # SecurityHeadersPolicy
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.viewer_request.arn
+    }
   }
 
   origin {
