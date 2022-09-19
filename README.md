@@ -12,14 +12,14 @@ Resources created at this level (within Terraform) can expose details to the tra
 
 Below is a table detailing how each concern has been broken up into logical separated units.
 
-| Context | Name                                       | Purpose                            | Example resources                        |
-| ------- | ------------------------------------------ | ---------------------------------- | ---------------------------------------- |
-| Shared  | [Network](./shared/network)                | Communication, spanning all stages | Route53 hosted zones for root domain     |
-| Stage   | [Apps/`Application`](./stage/apps/website) | Fulfil runtime requirements        | CloudFront, SSM, SQS, SNS                |
-| Stage   | [Data/`Application`](./stage/data/website) | Permanent storage                  | RDS, S3 (User uploads)                   |
-| Stage   | Health                                     | Monitoring and alerting            | S3 (logs), CloudTrail, CloudWatch alarms |
-| Stage   | [Network](./stage/network)                 | Communication, within given stage  | VPC, VPC endpoints, DNS, NAT-instance    |
-| Stage   | [Security](./stage/security)               | Security                           | KMS, WAF, GuardDuty                      |
+| Context | Name                               | Purpose                            | Example resources                        |
+| ------- | ---------------------------------- | ---------------------------------- | ---------------------------------------- |
+| Shared  | [Network](./shared/network)        | Communication, spanning all stages | Route53 hosted zones for root domain     |
+| Stage   | [Apps/`Application`](./stage/apps) | Fulfil runtime requirements        | CloudFront, SSM, SQS, SNS                |
+| Stage   | [Data/`Application`](./stage/data) | Permanent storage                  | RDS, S3 (User uploads)                   |
+| Stage   | Health                             | Monitoring and alerting            | S3 (logs), CloudTrail, CloudWatch alarms |
+| Stage   | [Network](./stage/network)         | Communication, within given stage  | VPC, VPC endpoints, DNS, NAT-instance    |
+| Stage   | [Security](./stage/security)       | Security                           | KMS, WAF, GuardDuty                      |
 
 For a clearer understanding of the meaning behind _Context_ and _Application_ please continue reading.
 
@@ -43,8 +43,7 @@ Resources within this _service_ have been designed in such a way that they can p
 ### Stage Applications
 
 The _service_ is composed of many _applications_ which are logically seperated within a given _stage_ based on runtime/storage requirements.
-Currently there is only a single _application_ named **Website**, which manages the infrastructure for the [RSVP website](https://github.com/eddmann/our-wedding-website).
-However, within the Wedding _service_ you could possibly see other applications such as a wedding-day photo upload service being added (although, unsure if I will actually have time to do this 😬).
+There are two applications - one named **Website**, which manages the infrastructure for the [RSVP website](https://github.com/eddmann/our-wedding-website); and another named **Gallery**, which manages infrastructure for the [photo gallery](https://github.com/eddmann/our-wedding-gallery).
 
 ## Tooling
 
