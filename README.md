@@ -2,7 +2,7 @@
 
 Because every Wedding RSVP website needs to be provisioned using Terraform (Cloud) within AWS.
 
-🌎 [Website](https://github.com/eddmann/our-wedding-website) | 🏗️ Infrastructure
+🌎 [Website](https://github.com/eddmann/our-wedding-website) | 📷 [Gallery](https://github.com/eddmann/our-wedding-gallery) | 🏗️ Infrastructure
 
 ## Overview
 
