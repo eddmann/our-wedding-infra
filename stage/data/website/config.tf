@@ -60,3 +60,15 @@ data "terraform_remote_state" "security" {
     }
   }
 }
+
+data "terraform_remote_state" "health" {
+  backend = "remote"
+
+  config = {
+    organization = "EddMann"
+
+    workspaces = {
+      name = format("our-wedding-health-%s", local.stage)
+    }
+  }
+}

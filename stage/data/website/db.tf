@@ -82,3 +82,73 @@ resource "aws_secretsmanager_secret_version" "website_db_url" {
     aws_rds_cluster.website.database_name,
   )
 }
+
+#
+# Health checks
+#
+
+# CPUUtilization > 75%
+resource "aws_cloudwatch_metric_alarm" "health_check_website_db_cpu_utilization" {
+  alarm_name = format("OurWedding-%s-Website-RdsCpuUtilization", title(local.stage))
+
+  namespace           = "AWS/RDS"
+  metric_name         = "CPUUtilization"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = "75"
+  evaluation_periods  = "1"
+  period              = "120"
+  statistic           = "Average"
+
+  dimensions = {
+    DBClusterIdentifier = aws_rds_cluster.website.id
+  }
+
+  alarm_actions   = [data.terraform_remote_state.health.outputs.health_checks_sns_topic_arn]
+  actions_enabled = true
+
+  tags = local.tags
+}
+
+# FreeableMemory < 128M
+resource "aws_cloudwatch_metric_alarm" "health_check_website_db_freeable_memory" {
+  alarm_name = format("OurWedding-%s-Website-RdsFreeableMemory", title(local.stage))
+
+  namespace           = "AWS/RDS"
+  metric_name         = "FreeableMemory"
+  comparison_operator = "LessThanThreshold"
+  threshold           = "134217728" # bytes
+  evaluation_periods  = "1"
+  period              = "120"
+  statistic           = "Average"
+
+  dimensions = {
+    DBClusterIdentifier = aws_rds_cluster.website.id
+  }
+
+  alarm_actions   = [data.terraform_remote_state.health.outputs.health_checks_sns_topic_arn]
+  actions_enabled = true
+
+  tags = local.tags
+}
+
+# FreeStorageSpace < 5G
+resource "aws_cloudwatch_metric_alarm" "health_check_website_db_free_storage_space" {
+  alarm_name = format("OurWedding-%s-Website-RdsFreeStorageSpace", title(local.stage))
+
+  namespace           = "AWS/RDS"
+  metric_name         = "FreeStorageSpace"
+  comparison_operator = "LessThanThreshold"
+  threshold           = "5368709120" # bytes
+  evaluation_periods  = "1"
+  period              = "120"
+  statistic           = "Average"
+
+  dimensions = {
+    DBClusterIdentifier = aws_rds_cluster.website.id
+  }
+
+  alarm_actions   = [data.terraform_remote_state.health.outputs.health_checks_sns_topic_arn]
+  actions_enabled = true
+
+  tags = local.tags
+}
