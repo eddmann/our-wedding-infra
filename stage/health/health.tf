@@ -1,6 +1,6 @@
 # Lambda: Errors > 0
 resource "aws_cloudwatch_metric_alarm" "health_check_lambda_errors" {
-  alarm_name = "LambdaErrors"
+  alarm_name = format("OurWedding-%s-LambdaErrors", title(local.stage))
 
   namespace           = "AWS/Lambda"
   metric_name         = "Errors"
@@ -21,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "health_check_lambda_errors" {
 resource "aws_cloudwatch_metric_alarm" "health_check_lambda_errors_us_east_1" {
   provider = aws.us_east_1
 
-  alarm_name = "LambdaErrors"
+  alarm_name = format("OurWedding-%s-LambdaErrors", title(local.stage))
 
   namespace           = "AWS/Lambda"
   metric_name         = "Errors"
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_metric_alarm" "health_check_lambda_errors_us_east_1" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "health_check_lambda_throttles" {
-  alarm_name = "LambdaThrottles"
+  alarm_name = format("OurWedding-%s-LambdaThrottles", title(local.stage))
 
   namespace           = "AWS/Lambda"
   metric_name         = "Throttles"
@@ -61,7 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "health_check_lambda_throttles" {
 resource "aws_cloudwatch_metric_alarm" "health_check_lambda_throttles_us_east_1" {
   provider = aws.us_east_1
 
-  alarm_name = "LambdaThrottles"
+  alarm_name = format("OurWedding-%s-LambdaThrottles", title(local.stage))
 
   namespace           = "AWS/Lambda"
   metric_name         = "Throttles"
